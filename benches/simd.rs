@@ -41,16 +41,21 @@ fn bench_simd_256_add_i64(b: &mut Bencher) {
 
 #[bench]
 fn bench_simd_512_add_f64(b: &mut Bencher) {
-    let a = vec![1f64; 1_000_000];
-    b.iter(|| {
-        test::black_box(simd::simd_512_add_f64(&a, &a));
-    });
+    if is_x86_feature_detected!("avx512f") {
+        let a = vec![1f64; 1_000_000];
+        b.iter(|| {
+            test::black_box(simd::simd_512_add_f64(&a, &a));
+        });
+    }
 }
 
 #[bench]
 fn bench_simd_512_add_i64(b: &mut Bencher) {
-    let a = vec![1i64; 1_000_000];
-    b.iter(|| {
-        test::black_box(simd::simd_512_add_i64(&a, &a));
-    });
+    if is_x86_feature_detected!("avx512f") {
+        let a = vec![1i64; 1_000_000];
+        b.iter(|| {
+            test::black_box(simd::simd_512_add_i64(&a, &a));
+        });
+    }
 }
+
