@@ -1,15 +1,11 @@
 #![feature(stdsimd)]
-#![feature(test)]
-
-extern crate test;
 
 use std::arch::x86_64::{_mm512_add_pd, _mm512_loadu_pd, _mm512_storeu_pd};
 use std::arch::x86_64::{_mm256_add_pd, _mm256_loadu_pd, _mm256_storeu_pd};
-use test::Bencher;
 
 type Vector = Vec<f64>;
 
-fn simd_256_add(a: &Vector, b: &Vector) -> Vector {
+pub fn simd_256_add(a: &Vector, b: &Vector) -> Vector {
     let mut result = vec![0f64; a.len()];
 
     const FLOATS_IN_AVX2_REGISTER: usize = 4;
@@ -18,7 +14,7 @@ fn simd_256_add(a: &Vector, b: &Vector) -> Vector {
 
     let mut i = 0usize;
     unsafe {
-        while i < vectorization_samples {
+        for _ in 0..result.len() / vectorization_samples {
             let a_register = _mm256_loadu_pd(a.as_ptr().add(i));
             let b_register = _mm256_loadu_pd(b.as_ptr().add(i));
 
@@ -37,7 +33,7 @@ fn simd_256_add(a: &Vector, b: &Vector) -> Vector {
     return result;
 }
 
-fn simd_512_add(a: &Vector, b: &Vector) -> Vector {
+pub fn simd_512_add(a: &Vector, b: &Vector) -> Vector {
     let mut result = vec![0f64; a.len()];
 
     const FLOATS_IN_AVX512_REGISTER: usize = 8;
@@ -46,7 +42,7 @@ fn simd_512_add(a: &Vector, b: &Vector) -> Vector {
 
     let mut i = 0usize;
     unsafe {
-        while i < vectorization_samples {
+        for _ in 0..result.len() / vectorization_samples {
             let a_register = _mm512_loadu_pd(a.as_ptr().add(i));
             let b_register = _mm512_loadu_pd(b.as_ptr().add(i));
 
@@ -65,7 +61,7 @@ fn simd_512_add(a: &Vector, b: &Vector) -> Vector {
     return result;
 }
 
-fn scalar_add(a: &Vector, b: &Vector) -> Vector {
+pub fn scalar_add(a: &Vector, b: &Vector) -> Vector {
     let mut result = vec![0f64; a.len()];
     for i in 0..result.len() {
         result[i] = a[i] + b[i];
@@ -95,26 +91,3 @@ fn main() {
     print_result(&result_scalar);
 }
 
-#[bench]
-fn bench_scalar_add(b: &mut Bencher) {
-    let a = vec![1f64; 1_000_000];
-    b.iter(|| {
-        test::black_box(scalar_add(&a, &a));
-    });
-}
-
-#[bench]
-fn bench_simd_256_add(b: &mut Bencher) {
-    let a = vec![1f64; 1_000_000];
-    b.iter(|| {
-        test::black_box(simd_256_add(&a, &a));
-    });
-}
-
-#[bench]
-fn bench_simd_512_add(b: &mut Bencher) {
-    let a = vec![1f64; 1_000_000];
-    b.iter(|| {
-        test::black_box(simd_512_add(&a, &a));
-    });
-}
