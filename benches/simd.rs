@@ -8,25 +8,49 @@ use test::Bencher;
 mod simd;
 
 #[bench]
-fn bench_scalar_add(b: &mut Bencher) {
+fn bench_scalar_add_f64(b: &mut Bencher) {
     let a = vec![1f64; 1_000_000];
     b.iter(|| {
-        test::black_box(simd::scalar_add(&a, &a));
+        test::black_box(simd::scalar_add_f64(&a, &a));
     });
 }
 
 #[bench]
-fn bench_simd_256_add(b: &mut Bencher) {
-    let a = vec![1f64; 1_000_000];
+fn bench_scalar_add_i64(b: &mut Bencher) {
+    let a = vec![1i64; 1_000_000];
     b.iter(|| {
-        test::black_box(simd::simd_256_add(&a, &a));
+        test::black_box(simd::scalar_add_i64(&a, &a));
     });
 }
 
 #[bench]
-fn bench_simd_512_add(b: &mut Bencher) {
+fn bench_simd_256_add_f64(b: &mut Bencher) {
     let a = vec![1f64; 1_000_000];
     b.iter(|| {
-        test::black_box(simd::simd_512_add(&a, &a));
+        test::black_box(simd::simd_256_add_f64(&a, &a));
+    });
+}
+
+#[bench]
+fn bench_simd_256_add_i64(b: &mut Bencher) {
+    let a = vec![1i64; 1_000_000];
+    b.iter(|| {
+        test::black_box(simd::simd_256_add_i64(&a, &a));
+    });
+}
+
+#[bench]
+fn bench_simd_512_add_f64(b: &mut Bencher) {
+    let a = vec![1f64; 1_000_000];
+    b.iter(|| {
+        test::black_box(simd::simd_512_add_f64(&a, &a));
+    });
+}
+
+#[bench]
+fn bench_simd_512_add_i64(b: &mut Bencher) {
+    let a = vec![1i64; 1_000_000];
+    b.iter(|| {
+        test::black_box(simd::simd_512_add_i64(&a, &a));
     });
 }
